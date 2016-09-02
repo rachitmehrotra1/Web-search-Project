@@ -1,1 +1,2 @@
-# Web-search-Project
+Probabilistic Topic Modeling in News Clustering
+& Representation
