@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script	src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+<link type="text/css" href="../css/ui-lightness/jquery-ui-1.8.21.custom.css" rel="stylesheet" />
+<link type="text/css" href="../css/lda.css" rel="stylesheet" />
+<link type="text/css" href="../css/style.css" rel="stylesheet" />
+<!-- <script type="text/javascript" src="../js/jquery-1.7.2.min.js"></script> -->
+<script type="text/javascript" src="../js/jquery-ui-1.8.21.custom.min.js"></script>
+<script src="../js/jquery.tagcanvas.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="../js/stopwords.js"></script>
+<script type="text/javascript" src="../js/lda.js"></script>
+<script type="text/javascript" src="../js/PorterStemmer.js"></script>
+
+<script type="text/javascript">
+function topicise(valueof) {
+	$("#results").append("<br /> <br />");
+	// console.log("analysing "+sentences.length+" sentences...");
+	var documents = new Array();
+	var docs = new Array();
+	var f = {};
+	var stem = {};
+	var vocab=new Array();
+	var docCount=0;
+	
+	for(var i=0;i<sentences.length;i++) {
+		docs[i] = new Array();
+		if (sentences[i]=="") continue;
+		var words = sentences[i].split(/[\s,\"]+/);
+		if(!words) continue;
+		var wordIndices = new Array();
+		for(var wc=0;wc<words.length;wc++) {
+			var w=words[wc].toLowerCase().replace(/[^a-z\'A-Z0-9 ]+/g, '');
+			//TODO: Add stemming - DONE
+			if (w=="" || w.length==1 || stopwords[w] || w.indexOf("http")==0) continue;
+			var stemWord=stemmer(w);
+			if(stem[stemWord]) {
+				w = stem[stemWord];
+			}
+			else {
+				stem[stemWord] = w;
+			}
+			if (docs[i][w]) {
+				docs[i][w]++;
+			}
+			else {
+				docs[i][w] = 1;
+			}
+			if (f[w]) { 
+				f[w]=f[w]+1;			
+			} 
+			else if(w) { 
+				f[w]=1; 
+				vocab.push(w); 
+			};	
+			wordIndices.push(vocab.indexOf(w));
+		}
+		if (wordIndices && wordIndices.length>0) {
+			documents[docCount++] = wordIndices;
+		}
+	}
+		
+	var V = vocab.length;
+	var M = documents.length;
+	var K = 1;//parseInt($( "#topics" ).val());
+	K = 8;
+	var alpha = 0.1;  // per-document distributions over topics
+	var beta = .01;  // per-topic distributions over words
+
+	lda.configure(documents,V,10000, 2000, 100, 10);
+	lda.gibbs(K, alpha, beta);
+
+	var theta = lda.getTheta();
+	var phi = lda.getPhi();
+
+	var text = '';
+
+	//topics
+	var topTerms=20;
+	var topicText = new Array();
+	var cluster = [];//new Array();
+	var clusterR = [];
+	var clusterIndex = new Array();
+	var counter= 0;
+	var temp='';
+	var tempz='';
+	$("#topiccloud").append("<br /> <br />");
+	for (var k = 0; k < phi.length; k++) {
+		counter=0;
+		tempz='<canvas id="topic'+(k+valueof)+'" class="topicbox color'+(k+valueof)+'" style><ul>';
+		text+='<canvas id="topic'+(k+valueof)+'" class="topicbox color'+(k+valueof)+'" style><ul>';
+		var tuples = new Array();
+		for (var w = 0; w < phi[k].length; w++) {
+			 tuples.push(""+phi[k][w].toPrecision(2)+"_"+vocab[w]);
+			 if (cluster[vocab[w]]) {
+				 if (phi[k][w].toPrecision(2) > cluster[vocab[w]])
+					 //cluster[vocab[w]] = phi[k][w].toPrecision(2);
+				 	//cluster.push({'\''+vocab[w]+'\'' : phi[k][w].toPrecision(2)});
+				 	cluster[vocab[w]] = phi[k][w].toPrecision(2);
+			 } 
+			 else {
+				 cluster[vocab[w]] = phi[k][w].toPrecision(2);
+				
+			 }
+		}
+		tuples.sort().reverse();
+		if(topTerms>vocab.length) topTerms=vocab.length;
+		topicText[k]='';
+		var temp = new Array();
+		for (var t = 0; t < topTerms; t++) {
+			var topicTerm=tuples[t].split("_")[1];
+			var prob=parseInt(tuples[t].split("_")[0]*100);
+			if (prob<0.0001) break;
+			temp.push(topicTerm);
+		}
+		temp.sort();
+		var maxSimilar = 0, maxIndex = -1;
+		for (var t = 0; t < clusterR.length; t++) {
+			var tempSimilar = 0;
+			for (var tt = 0, rr = 0; tt < clusterR[t].length && rr < temp.length;) {
+				if (clusterR[t][tt] === temp[rr]) {
+					tempSimilar++; tt++; rr++;
+				}
+				else if (clusterR[t][tt] > temp[rr]) { rr++; }
+				else { tt++; }
+			}
+			if (maxSimilar < tempSimilar) {
+				maxSimilar = tempSimilar;
+				maxIndex = t;
+			}
+		} 
+		var flagCluster = false;
+		if (maxSimilar < 15) {
+			flagCluster = true;
+			clusterR[k] = temp;
+			clusterIndex[k] = k;
+		} 
+		if (!flagCluster) {
+			clusterR[k] = new Array();
+			clusterIndex[k] = maxIndex;
+		}
+		for (var t = 0; flagCluster && t < topTerms; t++) {
+			var topicTerm=tuples[t].split("_")[1];
+			var prob=parseInt(tuples[t].split("_")[0]*100);
+			if (prob<0.0001) break;
+			counter++;
+			text+=( '<li><a href=javascript:event.preventDefault();crawlGuardian("'+topicTerm+'"); id="'+topicTerm+'" data-weight="'+(prob)+'" title="'+prob+'%">'+topicTerm +'</a></li>' );			
+			console.log("topic "+ k +": "+ topicTerm+" = " + prob  + "%");
+			topicText[k] += ( topicTerm +" ");
+		}
+		if(counter > 0)
+		text+='</ul></canvas>';
+		else
+		text=text.replace(tempz,' ')
+	}
+	text='</br></br>'+text;
+	$('#topiccloud').html(text);
+	
+	text='<div class="spacer"> </div>';
+
+	for (var m = 0; m < theta.length; m++) {
+		var max = 0, index = -1;
+		for (var k = 0; k < theta[m].length; k++) {
+			if (max < theta[m][k]) {
+				index = k;
+				max = theta[m][k];
+			}
+			$('#div'+m).attr("class", "box bgcolor" + index);
+	
+		}
+		
+	} 
+	
+	
+	 for (var k = 0; k < phi.length; k++) {
+		if(!$('#topic'+(k+valueof)).tagcanvas({
+		      textColour: $('#topic'+(k)).css('color'),
+			  maxSpeed: 0.05,
+			  initial: [(Math.random()>0.5 ? 1: -1) *Math.random()/2,(Math.random()>0.5 ? 1: -1) *Math.random()/2],  //[0.1,-0.1],
+			  decel: 0.98,
+			  reverse: true,
+			  weightSize:10,
+			  weightMode:'size',
+			  weightFrom:'data-weight',
+			  weight: true
+			}))	
+		{
+			$('#topic'+(k+valueof)).hide();
+		} else {
+			
+		}
+	} 
+}
+
+$(document).ready(function(){
+});
+
+
+
+var sentences = [""];
+</script>
+<script type="text/javascript" src="../js/Crawler.js"></script>
+<style>
+.site-footer, .page-wrap:after {
+  /* .push must be the same height as footer */
+	height: $leading*2; 
+}
+.site-footer {
+  background: #FF3C00;
+  color:black;
+  text-align:center;
+  p{
+    padding-top:$leading/2;
+    padding-bottom:$leading/2;
+  }
+}
+</style>
+
+
+<title>News Engine</title>
+<script> 
+ $(document).ready(function(){
+    alert('For Animations to Work Please View in Google Chrome :)');
+ });
+</script>
+</head>
+<body>
+	<div id="search_back" class="center_nm">
+	<div id="search_div" class="center">
+		<form action="javascript:crawlGuardian(document.getElementById('searchf').value)" class="search-wrapper cf">
+        <input id="searchf" name="inputq" type="text" placeholder="What are you looking for?" required="">
+        <button type="submit">Search</button>
+	</form>
+	</div>
+	</div>
+	
+	<div class="lower_border">
+	<div id="topiccloud"></div>
+	<div id="results"></div>
+	</div>
+	<footer class="site-footer">
+  <p>Web Search Engines Project - Spring'16 <br />
+  	Rachit Mehrotra - Iqra Shahid</p>
+</footer>
+	
+</body>
+</html>

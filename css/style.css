@@ -1,0 +1,180 @@
+.center{
+margin-left: auto;
+margin-right: auto;
+margin-top:-3em;
+}
+
+#search_div{
+width: 400px;
+height: 150px;
+}
+
+#search_back{
+background-image: url("http://www.planwallpaper.com/static/images/cool-background.jpg");
+}
+
+.center_nm{
+margin-left: auto;
+margin-right: auto;
+margin-top: -20px;
+}
+
+.center_back_red{
+margin-left: auto;
+margin-right: auto;
+margin-top: 20px;
+background:red;
+width: 400px;
+height: 200px;
+}
+
+
+.center_back_white{
+margin-left: auto;
+margin-right: auto;
+margin-top: 20px;
+width: 400px;
+height: 200px;
+}
+
+
+.lower_border{
+margin-top: 5px;
+border: 5px solid #a1a1a1;
+padding: 10px 40px;
+}
+
+#topiccloud {
+position: relative;
+float: right;
+}
+
+
+
+/* page defaults */
+
+html {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+   
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+
+/* search elements */
+
+.cf:before, .cf:after{
+    content:"";
+    display:table;
+}
+ 
+.cf:after{
+    clear:both;
+}
+ 
+.cf{
+    zoom:1;
+}    
+
+ /* Form wrapper styling */
+.search-wrapper {
+	padding-top: 10px;
+width: 410px;
+margin: 45px auto 50px auto;
+}
+ 
+/* Form text input */
+ 
+.search-wrapper input {
+width: 315px;
+height: 45px;
+padding: 10px 10px;
+float: left;
+font:  1em 'Helvetica Neue', Arial, Helvetica, sans-serif;
+border: 0;
+background: #f5f5f5;
+  -webkit-border-top-left-radius: 2px;
+  -webkit-border-bottom-left-radius: 2px;
+  -moz-border-radius-topleft: 2px;
+  -moz-border-radius-bottomleft: 2px;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+ 
+.search-wrapper input:focus {
+    outline: 0;
+    background: #fff;
+}
+ 
+.search-wrapper input::-webkit-input-placeholder {
+   color: #999;
+   font-weight: normal;
+}
+ 
+.search-wrapper input:-moz-placeholder {
+    color: #999;
+    font-weight: normal;
+}
+ 
+.search-wrapper input:-ms-input-placeholder {
+    color: #999;
+    font-weight: normal;
+}    
+ 
+/* Form submit button */
+.search-wrapper button {
+overflow: visible;
+position: relative;
+float: right;
+cursor: pointer;
+height: 45px;
+width: 95px;
+font:  1em/1.5 'Helvetica Neue', Arial, Helvetica, sans-serif;
+color: white;
+text-transform: uppercase;
+background: #f78d1d;
+border: 1px solid #f78d1d;
+  -webkit-border-top-right-radius: 2px;
+  -webkit-border-bottom-right-radius: 2px;
+  -moz-border-radius-topright: 2px;
+  -moz-border-radius-bottomright: 2px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+   
+.search-wrapper button:hover{     
+    background: #ff7e00;
+}   
+   
+.search-wrapper button:active,
+.search-wrapper button:focus{   
+    background: #ff7e00;
+    outline: 0;   
+}
+ 
+.search-wrapper button:before { /* left arrow */
+    content: '';
+    position: absolute;
+    border-width: 11px 11px 11px 0;
+    border-style: solid solid solid none;
+    border-color: transparent #f78d1d transparent;
+    top: 11px;
+    left: -8px;
+}
+ 
+.search-wrapper button:hover:before{
+    border-right-color: #ff7e00;
+}
+ 
+.search-wrapper button:focus:before,
+.search-wrapper button:active:before{
+        border-right-color: #ff7e00;
+}      
+ 
+.search-wrapper button::-moz-focus-inner { /* remove extra button spacing for Mozilla Firefox */
+    border: 0;
+    padding: 0;
+}
