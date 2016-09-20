@@ -1,6 +1,11 @@
 /*
  * Based on LDA Gibbs Sampler by  Blei et al. 2003
  */
+
+
+ //Rachit Mehrotra
+//rm4149@nyu.edu
+
  
 function makeArray(x) {
 	var a = new Array();	

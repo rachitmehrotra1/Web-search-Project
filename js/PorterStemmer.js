@@ -1,3 +1,5 @@
+//Rachit Mehrotra
+//rm4149@nyu.edu
 
 var stemmer = (function(){
   var step2list = {

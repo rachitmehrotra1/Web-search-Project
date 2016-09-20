@@ -1,5 +1,9 @@
 
 
+//Rachit Mehrotra
+//rm4149@nyu.edu
+
+
 function callSolr() {
 	// We tried to work with solr and had the whole solr backend setup and working , but as the NY Times Corpus was paid
 	// and not avaialable to us even through Bobst Library accounts , we didn't use it in the final project, but if the dataset is given
